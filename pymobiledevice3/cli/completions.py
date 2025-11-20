@@ -1,24 +1,27 @@
 import logging
-from collections import namedtuple
 from pathlib import Path
+from typing import NamedTuple
 
-import click
+import typer
 from plumbum import CommandNotFound, local
 
 logger = logging.getLogger(__name__)
 
-ShellCompletion = namedtuple("ShellCompletion", ["source", "rc", "path"])
+
+class ShellCompletion(NamedTuple):
+    source: str
+    rc: Path | None
+    path: Path
+
 
 COMPLETIONS = [
-    ShellCompletion("zsh_source", Path("~/.zshrc").expanduser(), Path("~/.pymobiledevice3.zsh").expanduser()),
-    ShellCompletion("bash_source", Path("~/.bashrc").expanduser(), Path("~/.pymobiledevice3.bash").expanduser()),
-    ShellCompletion("fish_source", None, Path("~/.config/fish/completions/pymobiledevice3.fish").expanduser()),
+    ShellCompletion("source_zsh", Path("~/.zshrc").expanduser(), Path("~/.pymobiledevice3.zsh").expanduser()),
+    ShellCompletion("source_bash", Path("~/.bashrc").expanduser(), Path("~/.pymobiledevice3.bash").expanduser()),
+    ShellCompletion("source_fish", None, Path("~/.config/fish/completions/pymobiledevice3.fish").expanduser()),
 ]
 
 
-@click.group()
-def cli() -> None:
-    pass
+cli = typer.Typer()
 
 
 @cli.command()
@@ -43,7 +46,7 @@ def install_completions() -> None:
             completion.path.write_text(pymobiledevice3())
             line = f"source {completion.path}"
 
-            if not completion.rc.exists() or line in completion.rc.read_text():
+            if completion.rc is None or not completion.rc.exists() or line in completion.rc.read_text():
                 continue
 
             logger.info(f"Adding source line to {completion.rc}")

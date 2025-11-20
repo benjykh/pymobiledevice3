@@ -89,6 +89,8 @@ select = [
     "TRY",
 ]
 ignore = [
+    # Shadowing a built-in
+    "A001",
     # LineTooLong
     "E501",
     # Custom error classes
@@ -98,7 +100,7 @@ ignore = [
     # Abstract `raise` to an inner function
     "TRY301",
     # Do not perform function call `csfield` in dataclass defaults
-    "RUF009"
+    "RUF009",
 ]
 
 [tool.ruff.format]
